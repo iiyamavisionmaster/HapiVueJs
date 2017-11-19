@@ -1,0 +1,22 @@
+{
+  "name": "hapivuejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iiyamavisionmaster/HapiVueJs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iiyamavisionmaster/HapiVueJs/issues"
+  },
+  "homepage": "https://github.com/iiyamavisionmaster/HapiVueJs#readme",
+  "dependencies": {
+    "hapi": "^16.6.2"
+  }
+}
