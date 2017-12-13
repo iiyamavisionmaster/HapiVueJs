@@ -40,6 +40,28 @@ mongoose.Promise = global.Promise;
         path: '/api/crime/{compnos?}',
         handler: Handler.crimeUpdate
     });
+   server.route({
+        config: {
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
+        },
+        method: 'GET',
+        path: '/api/typearme',
+        handler: Handler.typearme
+    });
+   server.route({
+        config: {
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
+        },
+        method: 'GET',
+        path: '/api/incident_type_description',
+        handler: Handler.incident_type_description
+    });
       next();
 };
 const Handler = {};
@@ -72,12 +94,16 @@ Handler.crimes = (request, reply) => {
                         }));
                 var dateDebut = new Date(request.query.dateDebut);
                 var dateFin = new Date(request.query.dateFin);
-                console.log(new Date(dateDebut.toISOString()) + ' ' + new Date(dateFin.toISOString()))
-                var query = mongoose.model('crime_incident_reports').find({
-                    fromdate: {  $gte : new Date(dateDebut.toISOString()) , $lte : new Date(dateFin.toISOString())  },
+                console.log(request.query.incident_type_description);
+                var query = mongoose.model('crime_incident_reports').find(
+                    {
+                    'weapontype': request.query.weapontype,
+                    'incident_type_description': request.query.incident_type_description,
+                    fromdate: {  $gte : new Date(dateDebut.toISOString()) , $lte : new Date(dateFin.toISOString())  }
                     // likes: { $in: ['vaporizing', 'talking'] }
                 },function(err, obj) {
-                    if (err) return handleError(err);
+                    if (err) return err;
+                    console.log(obj);
                     reply(obj);
                 }).limit(parseInt(request.query.Limit)).skip(parseInt(request.query.Skip));//select({ name: 1, occupation: 1 }).
 
@@ -98,7 +124,7 @@ Handler.crimeUpdate = (request, reply) => {
                 //     reply(obj);
                 // });
                 var query = mongoose.model('crime_incident_reports').findOneAndUpdate(
-                    { compnos: request.payload.compnos },
+                    { id: request.payload.id },
                     { naturecode: request.payload.naturecode ,
                     incident_type_description: request.payload.incident_type_description ,
                     main_crimecode: request.payload.main_crimecode ,
@@ -121,6 +147,40 @@ Handler.crimeUpdate = (request, reply) => {
                     function (err, doc){
                         reply(doc.id)
                 });
+            } catch (err) {
+                throw err;
+            }
+        }
+Handler.typearme = (request, reply) => {
+            try {
+                require('../model/crime');
+                const util = require('util')
+                console.log(util.inspect(request.query, {
+                            showHidden: false,
+                            depth: null
+                        }));
+                var query = mongoose.model('crime_incident_reports').distinct( 'weapontype',{}, function(err, obj) {
+                    if (err) return handleError(err);
+                    reply(obj);
+                })//select({ name: 1, occupation: 1 }).
+
+            } catch (err) {
+                throw err;
+            }
+        }
+Handler.incident_type_description = (request, reply) => {
+            try {
+                require('../model/crime');
+                const util = require('util')
+                console.log(util.inspect(request.query, {
+                            showHidden: false,
+                            depth: null
+                        }));
+                var query = mongoose.model('crime_incident_reports').distinct( 'incident_type_description',{}, function(err, obj) {
+                    if (err) return handleError(err);
+                    reply(obj);
+                })//select({ name: 1, occupation: 1 }).
+
             } catch (err) {
                 throw err;
             }

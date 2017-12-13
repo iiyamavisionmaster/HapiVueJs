@@ -21,6 +21,10 @@
       </b-form-group>
 <input id="dateDebut" type="datetime-local" name="dateDebut" class="form-control">
 <input id="dateFin" type="datetime-local" name="dateFin" class="form-control">
+    <b-form-select v-model="selected" :options="weaponType" class="mb-3">
+    </b-form-select>
+    <b-form-select v-model="selected2" :options="incident_type_description" class="mb-3">
+    </b-form-select>
                <b-button type="submit" variant="primary">Submit</b-button>
             </b-form>
          </b-row>
@@ -61,7 +65,23 @@
         markers: [{
           position: {lat: 10.0, lng: 10.0}
         }],
-        list: []
+        list: [],
+        selected: null,
+        selected2: null,
+        weaponType: [],
+        incident_type_description: []
+      }
+    },
+    async created () {
+      const res = await axios('http://localhost:1337/api/incident_type_description')
+      var list2 = res.data
+      for (var type = 0; type < list2.length; type++) {
+        this.incident_type_description.push(JSON.parse('{"value": "' + list2[type] + '", "text": "' + list2[type] + '"}'))
+      }
+      const res2 = await axios('http://localhost:1337/api/typearme')
+      list2 = res2.data
+      for (type = 0; type < list2.length; type++) {
+        this.weaponType.push(JSON.parse('{"value": "' + list2[type] + '", "text": "' + list2[type] + '"}'))
       }
     },
     async fetch ({
@@ -75,10 +95,11 @@
     },
     methods: {
       async get (data) {
-        console.log(data)
-        const res = await axios('http://localhost:1337/api/crimes?Skip=' + data.target[1].value + '&Limit=' + data.target[3].value + '&dateDebut=' + data.target[4].value + '&dateFin=' + data.target[5].value)
+        console.log('test')
+        const res = await axios('http://localhost:1337/api/crimes?Skip=' + data.target[1].value + '&Limit=' + data.target[3].value + '&dateDebut=' + data.target[4].value + '&dateFin=' + data.target[5].value + '&weapontype=' + data.target[6].value + '&incident_type_description=' + data.target[7].value)
         var list2 = res.data
         this.list = list2
+        console.log(list2 + 'test')
         for (var crime = 0; crime < list2.length; crime++) {
           list2[crime].VOIR = '<a href="/pages/item/' + list2[crime]._id + '">VOIR</a>'
           var location = list2[crime].location
