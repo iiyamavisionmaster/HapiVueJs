@@ -1,0 +1,7 @@
+{
+	"api" : {
+		"port" : 1337,
+		"host" : "localhost"
+	},
+	"key" : "secret"
+}
